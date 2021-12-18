@@ -20,7 +20,7 @@ contract("Souls", async (accounts) => {
         try {
             await soulsInstance.createUser(hex(TEST_USERNAME), hex(TEST_NAME), { from: accounts[1] });
         } catch (error) {
-            assert(error.message.indexOf('revert Username already exists') >= 0, 'error message must contain proper return message');
+            assert(error.message.indexOf('revert Username already exists') >= 0, 'error message must contain proper message');
         }
     })
 
@@ -29,23 +29,34 @@ contract("Souls", async (accounts) => {
         const testUser = await soulsInstance.users(hex(TEST_USERNAME));
         assert.equal(testUser.bio, TEST_BIO, 'bio is set correct');
     })
-    // TODO test Links:
-    //  add links
-    //  add 1 link
-    //  remove link
-    //  remove link which does not
-    //  update link
+
+    it('does not allow others to update a bio of a user he does not own', async () => {
+        try {
+            await soulsInstance.updateBio(hex(TEST_USERNAME), TEST_BIO, { from: accounts[1] });
+        } catch (error) {
+            assert(error.message.indexOf('You are not the owner') >= 0, 'error message must contain proper message');
+        }
+    })
 
     it('allows to update avatar', async () => {
         await soulsInstance.updateAvatar(hex(TEST_USERNAME), 'https://testImageLink.com/23993ad3', { from: accounts[0] });
         const testUser = await soulsInstance.users(hex(TEST_USERNAME));
         assert.equal(testUser.avatar, 'https://testImageLink.com/23993ad3', 'avatar is set correct');
     })
+
     it('allows to delete user', async () => {
         await soulsInstance.deleteUser(hex(TEST_USERNAME, { from: accounts[0] }));
         const testUser = await soulsInstance.users(hex(TEST_USERNAME));
         assert(!testUser.isActive, 'user is deleted');
     })
+
+    // TODO test Links:
+    //  add links
+    //  add 1 link
+    //  remove link
+    //  remove link which does not
+    //  update link
+    //  update link which does not exist
 })
 
 function padRight(str, paddingLength) {
