@@ -39,7 +39,7 @@ contract Souls {
         public
         onlyUserOwner(_username)
     {
-        require(_index < users[_username].links.length);
+        require(_index < users[_username].links.length, "Index does not exist");
         users[_username].links[_index] = users[_username].links[users[_username].links.length - 1];
         users[_username].links.pop();
     }

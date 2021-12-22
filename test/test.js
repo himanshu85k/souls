@@ -67,24 +67,31 @@ contract("Souls", async (accounts) => {
         }
     })
 
-    // TODO complete this test
-    // it('allows to override a link', async () => {
-    //     //
-    //     await soulsInstance.addLink(hex(TEST_USERNAME), hex('youtube'), hex('lorem555'), { from: accounts[0] });
-    // })
-
     it('allows to delete links', async () => {
         //  remove link
         await soulsInstance.deleteLink(hex(TEST_USERNAME), 1, { from: accounts[0] });
         const links = await soulsInstance.getLinks(hex(TEST_USERNAME));
         assert((links[1][0] == hex('twitter') && links[1][1] == hex('lorem777')), 'second link deleted');
-
+    })
+    it('does not allow to delete links of index which is out of bounds', async () => {
+        try {
+            await soulsInstance.deleteLink(hex(TEST_USERNAME), 4, { from: accounts[0] });
+        } catch (error) {
+            assert(error.message.indexOf('Index does not exist') >= 0, 'error message must contain proper error message');
+        }
     })
 
     it('allows to delete user', async () => {
         await soulsInstance.deleteUser(hex(TEST_USERNAME), { from: accounts[0] });
         const testUser = await soulsInstance.users(hex(TEST_USERNAME));
         assert(!testUser.isActive, 'user is deleted');
+    })
+    it('does not allow to delete a non existing user', async () => {
+        try {
+            await soulsInstance.deleteUser(hex(TEST_USERNAME), { from: accounts[0] });
+        } catch (error) {
+            assert(error.message.indexOf('You are not the owner') >= 0, 'error message must contain proper error message');
+        }
     })
 })
 
