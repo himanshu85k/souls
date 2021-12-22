@@ -12,7 +12,7 @@ contract("Souls", async (accounts) => {
         await soulsInstance.createUser(hex(TEST_USERNAME), hex(TEST_NAME), { from: accounts[0] });
         const testUser = await soulsInstance.users(hex(TEST_USERNAME));
         assert.equal(testUser.isActive, true, 'user is active');
-        assert.equal(testUser.name, padRight(hex(TEST_NAME), 66), 'name is set correct');
+        assert.equal(testUser.name, hex(TEST_NAME), 'name is set correct');
         assert.equal(testUser.owner, accounts[0], 'owner is set correct');
     });
 
@@ -44,25 +44,54 @@ contract("Souls", async (accounts) => {
         assert.equal(testUser.avatar, 'https://testImageLink.com/23993ad3', 'avatar is set correct');
     })
 
+    it('allows to add links', async () => {
+        await soulsInstance.addLink(hex(TEST_USERNAME), hex('youtube'), hex('lorem555'), { from: accounts[0] });
+        await soulsInstance.addLink(hex(TEST_USERNAME), hex('instagram'), hex('lorem666'), { from: accounts[0] });
+        await soulsInstance.addLink(hex(TEST_USERNAME), hex('twitter'), hex('lorem777'), { from: accounts[0] });
+        const links = await soulsInstance.getLinks(hex(TEST_USERNAME));
+        assert((links[0][0] == hex('youtube') && links[0][1] == hex('lorem555')), 'first link added');
+        assert((links[1][0] == hex('instagram') && links[1][1] == hex('lorem666')), 'second link added');
+        assert((links[2][0] == hex('twitter') && links[2][1] == hex('lorem777')), 'third link added');
+    })
+
+    it('does not allow to create invalid links', async () => {
+        try {
+            await soulsInstance.addLink(hex(TEST_USERNAME), hex(''), hex('lorem555'), { from: accounts[0] });
+        } catch (error) {
+            assert(error.message.indexOf('Network must not be empty') >= 0, 'error message must contaion proper error message');
+        }
+        try {
+            await soulsInstance.addLink(hex(TEST_USERNAME), hex('something'), hex(''), { from: accounts[0] });
+        } catch (error) {
+            assert(error.message.indexOf('Network\'s Username must not be empty') >= 0, 'error message must contaion proper error message');
+        }
+    })
+
+    // TODO complete this test
+    // it('allows to override a link', async () => {
+    //     //
+    //     await soulsInstance.addLink(hex(TEST_USERNAME), hex('youtube'), hex('lorem555'), { from: accounts[0] });
+    // })
+
+    it('allows to delete links', async () => {
+        //  remove link
+        await soulsInstance.deleteLink(hex(TEST_USERNAME), 1, { from: accounts[0] });
+        const links = await soulsInstance.getLinks(hex(TEST_USERNAME));
+        assert((links[1][0] == hex('twitter') && links[1][1] == hex('lorem777')), 'second link deleted');
+
+    })
+
     it('allows to delete user', async () => {
-        await soulsInstance.deleteUser(hex(TEST_USERNAME, { from: accounts[0] }));
+        await soulsInstance.deleteUser(hex(TEST_USERNAME), { from: accounts[0] });
         const testUser = await soulsInstance.users(hex(TEST_USERNAME));
         assert(!testUser.isActive, 'user is deleted');
     })
-
-    // TODO test Links:
-    //  add links
-    //  add 1 link
-    //  remove link
-    //  remove link which does not
-    //  update link
-    //  update link which does not exist
 })
 
 function padRight(str, paddingLength) {
     return (str + '0000000000000000000000000000000000000000000000000000000000000000').substring(0, paddingLength);
 }
 
-function hex(str) {
-    return web3.utils.asciiToHex(str);
+function hex(str, paddingLength = 66) {
+    return padRight(web3.utils.asciiToHex(str), paddingLength);
 }
