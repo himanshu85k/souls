@@ -4,11 +4,11 @@ pragma experimental ABIEncoderV2;
 contract Souls {
     struct User {
         bool isActive;
-        bytes32[][] links; // Networkname to social media username
         bytes32 name;
         address owner;
         string bio;
         string avatar; // link to public profile image
+        bytes32[][] links; // Networkname to social media username
     }
 
     mapping(bytes32 => User) public users; // username to Users mapping
