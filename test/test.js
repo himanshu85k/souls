@@ -1,5 +1,5 @@
 var Souls = artifacts.require('./Souls.sol');
-const TEST_USERNAME = 'testUserName';
+const TEST_USERNAME = 'testUsername';
 const TEST_BIO = 'test bio';
 const TEST_NAME = 'testName';
 const TEST_AVATAR = 'https://testImageLink.com/23993ad3';
@@ -10,6 +10,7 @@ contract("Souls", async (accounts) => {
     it('creates a user with correct values', async () => {
         soulsInstance = await Souls.deployed();
         await soulsInstance.createUser(hex(TEST_USERNAME), hex(TEST_NAME), { from: accounts[0] });
+        console.log('username and name:', hex(TEST_USERNAME), hex(TEST_NAME));
         const testUser = await soulsInstance.users(hex(TEST_USERNAME));
         assert.equal(testUser.isActive, true, 'user is active');
         assert.equal(testUser.name, hex(TEST_NAME), 'name is set correct');
@@ -102,3 +103,9 @@ function padRight(str, paddingLength) {
 function hex(str, paddingLength = 66) {
     return padRight(web3.utils.asciiToHex(str), paddingLength);
 }
+
+/**
+ *  await contract.createUser('0x74657374557365726e616d650000000000000000000000000000000000000000', '0x746573744e616d65000000000000000000000000000000000000000000000000');
+ * 
+ * const testUser = await contract.users('0x74657374557365726e616d650000000000000000000000000000000000000000')
+ */
