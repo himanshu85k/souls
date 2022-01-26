@@ -19,7 +19,7 @@ export let account;
   web3 = new Web3(Web3.givenProvider || "http://localhost:7545");
   contractInstance = new web3.eth.Contract(
     Souls.abi,
-    "0x108aa63F14aF40f13C8c9A6753226163AaA26Bd7"
+    "0x6c44434F5db9e5116938C29E86085dc6b1BEb673"
   );
   await window.ethereum.enable(); // connect to metamask
   const accounts = await web3.eth.getAccounts();
@@ -39,7 +39,6 @@ export const searchUser = async (searchInput) => {
 function App() {
   return (
     <div className="App">
-      {/* Add react router */}
       <Navbar></Navbar>
       <Router>
         <Routes>

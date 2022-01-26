@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { searchUser } from "../App.js";
+import { searchUser, web3 } from "../App.js";
 
 function Profile() {
   const [username, setUsername] = useState("");
@@ -13,8 +13,27 @@ function Profile() {
   useEffect(() => {
     (async (username) => {
       if (username) {
-        const user = await searchUser(username);
-        setUser(user);
+        const userFound = await searchUser(username);
+        console.log("User found", userFound);
+        /**
+         * bool isActive;
+        bytes32 name;
+        address owner;
+        string bio;
+        string avatar; // link to public profile image
+        bytes32[][] links;
+         */
+        const userModified = {
+          ...userFound,
+          name: web3.utils.hexToAscii(userFound.name),
+          links: (userFound.links || []).map((item) => [
+            web3.utils.hexToAscii(item[0]),
+            web3.utils.hexToAscii(item[1]),
+          ]),
+        };
+        setUsername(username);
+        console.log("User Modified", userModified);
+        setUser(userModified);
       }
     })(params.username);
   }, []);
@@ -34,10 +53,14 @@ function Profile() {
       {/* TODO 1 provide a way to update the avatar: <img src={user.avatar}></img><i onClick={}></i> */}
       {user && user.isActive && (
         <>
-          Username: {username}<br/>
-          Name: {user.name}<br/>
-          Owner: {user.owner} {isOwner && "(You)"}<br/>
-          Bio: {user.bio}<br/>
+          Username: {username}
+          <br />
+          Name: {user.name}
+          <br />
+          Owner: {user.owner} {isOwner && "(You)"}
+          <br />
+          Bio: {user.bio}
+          <br />
           Links:{" "}
           {user.links &&
             user.links.map((link, index) => {
@@ -61,18 +84,19 @@ function Profile() {
                   ></i>
                   {
                     isOwner && <i className="bi bi-x"></i>
-                    // show delete link option
+                    // TODO 4: implement delete handlerd
                   }
-                  <br/>
+                  <br />
                 </>
               );
             })}
-            <br/>
+          <br />
           {isOwner && (
             <button>
               Add Link
               <i class="bi bi-plus"></i>
             </button>
+            // TODO 5: provide input fields to enter new social media name and link
           )}
         </>
       )}

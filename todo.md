@@ -58,14 +58,18 @@
     const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
     module.exports = {
-    // Other rules...
-    plugins: [
-    new NodePolyfillPlugin()
-    ]
+      return {
+        // Other rules...
+        plugins: [
+        new NodePolyfillPlugin()
+        ]
+      }
+
     }
     ```
 
   - add config-overrides.js
+
     ```
     const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 

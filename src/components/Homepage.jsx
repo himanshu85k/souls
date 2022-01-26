@@ -1,6 +1,13 @@
 import React, { useState } from "react";
-import { APP_NAME, APP_DESCRIPTION, searchUser, contractInstance, web3, account } from "../App.js";
-import {useNavigate} from 'react-router-dom';
+import {
+  APP_NAME,
+  APP_DESCRIPTION,
+  searchUser,
+  contractInstance,
+  web3,
+  account,
+} from "../App.js";
+import { useNavigate } from "react-router-dom";
 
 const USERNAME_PREEXISTS = "Username already exists! try something different.";
 
@@ -22,11 +29,21 @@ export default function Homepage() {
   };
 
   const handleCreateAccount = async () => {
-    await contractInstance.methods.createUser(web3.utils.asciiToHex(username), web3.utils.asciiToHex(name)).send({from: account});
-    // TODO 4 show user created message
+    contractInstance.methods
+      .createUser(web3.utils.asciiToHex(username), web3.utils.asciiToHex(name))
+      .send({ from: account });
     // TODO 2 if creation is succesful then only route to profile page
-    navigate('/' + username);
-  }
+    const e = contractInstance.events
+      .UserCreatedEvent({})
+      .on("data", async (event) => {
+        console.log('user created', event.returnValues);
+        // TODO 2 show user created notification
+        navigate("/" + username);
+      })
+      .on("error", console.error);
+      console.log('event listener', e);
+    // navigate("/" + username);
+  };
 
   return (
     <div>
@@ -39,9 +56,9 @@ export default function Homepage() {
         value={username}
         onChange={handleSearchChange}
       />
-      { searchResult && !searchResult.isActive && username && (
+      {searchResult && !searchResult.isActive && username && (
         <>
-          <br/>
+          <br />
           Name:
           <input
             title="name"
