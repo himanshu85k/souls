@@ -8,7 +8,7 @@ contract Souls {
         address owner;
         string bio;
         string avatar; // link to public profile image
-        bytes32[][] links; // Networkname to social media username
+        string[][] links; // Networkname to social media username
     }
 
     mapping(bytes32 => User) public users; // username to Users mapping
@@ -33,11 +33,11 @@ contract Souls {
 
     function addLink(
         bytes32 _username,
-        bytes32 _networkName,
-        bytes32 _networkUsername
+        string memory _networkName,
+        string memory _networkUsername
     ) public onlyUserOwner(_username) {
-        require(_networkName[0] != 0, "Network must not be empty");
-        require(_networkUsername[0] != 0, "Network's Username must not be empty");
+        require(bytes(_networkName).length != 0, "Network must not be empty");
+        require(bytes(_networkUsername).length != 0, "Network's Username must not be empty");
         users[_username].links.push([_networkName, _networkUsername]);
         emit UserAttributesUpdated(_username, '0x6164644c696e6b'); // 2nd parameter is bytes32 representation of text 'addLink'
     }
@@ -55,7 +55,7 @@ contract Souls {
     function getLinks(bytes32 _username)
         public
         view
-        returns (bytes32[][] memory)
+        returns (string[][] memory)
     {
         return users[_username].links;
     }

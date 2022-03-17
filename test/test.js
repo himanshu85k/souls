@@ -46,23 +46,23 @@ contract("Souls", async (accounts) => {
     })
 
     it('allows to add links', async () => {
-        await soulsInstance.addLink(hex(TEST_USERNAME), hex('youtube'), hex('lorem555'), { from: accounts[0] });
-        await soulsInstance.addLink(hex(TEST_USERNAME), hex('instagram'), hex('lorem666'), { from: accounts[0] });
-        await soulsInstance.addLink(hex(TEST_USERNAME), hex('twitter'), hex('lorem777'), { from: accounts[0] });
+        await soulsInstance.addLink(hex(TEST_USERNAME), 'youtube', 'lorem555', { from: accounts[0] });
+        await soulsInstance.addLink(hex(TEST_USERNAME), 'instagram', 'lorem666', { from: accounts[0] });
+        await soulsInstance.addLink(hex(TEST_USERNAME), 'twitter', 'lorem777', { from: accounts[0] });
         const links = await soulsInstance.getLinks(hex(TEST_USERNAME));
-        assert((links[0][0] == hex('youtube') && links[0][1] == hex('lorem555')), 'first link added');
-        assert((links[1][0] == hex('instagram') && links[1][1] == hex('lorem666')), 'second link added');
-        assert((links[2][0] == hex('twitter') && links[2][1] == hex('lorem777')), 'third link added');
+        assert((links[0][0] === 'youtube' && links[0][1] === 'lorem555'), 'first link added');
+        assert((links[1][0] === 'instagram' && links[1][1] === 'lorem666'), 'second link added');
+        assert((links[2][0] === 'twitter' && links[2][1] === 'lorem777'), 'third link added');
     })
 
     it('does not allow to create invalid links', async () => {
         try {
-            await soulsInstance.addLink(hex(TEST_USERNAME), hex(''), hex('lorem555'), { from: accounts[0] });
+            await soulsInstance.addLink(hex(TEST_USERNAME), '', 'lorem555', { from: accounts[0] });
         } catch (error) {
             assert(error.message.indexOf('Network must not be empty') >= 0, 'error message must contaion proper error message');
         }
         try {
-            await soulsInstance.addLink(hex(TEST_USERNAME), hex('something'), hex(''), { from: accounts[0] });
+            await soulsInstance.addLink(hex(TEST_USERNAME), 'something', '', { from: accounts[0] });
         } catch (error) {
             assert(error.message.indexOf('Network\'s Username must not be empty') >= 0, 'error message must contaion proper error message');
         }
@@ -72,7 +72,7 @@ contract("Souls", async (accounts) => {
         //  remove link
         await soulsInstance.deleteLink(hex(TEST_USERNAME), 1, { from: accounts[0] });
         const links = await soulsInstance.getLinks(hex(TEST_USERNAME));
-        assert((links[1][0] == hex('twitter') && links[1][1] == hex('lorem777')), 'second link deleted');
+        assert((links[1][0] === 'twitter' && links[1][1] === 'lorem777'), 'second link deleted');
     })
     it('does not allow to delete links of index which is out of bounds', async () => {
         try {
