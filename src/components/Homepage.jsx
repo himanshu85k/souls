@@ -24,6 +24,8 @@ export default function Homepage() {
     setSearchResult(ss);
   };
 
+  // TODO 5 on searchEnterKeyPress open the profile page
+
   const handleHomepageNameChange = (e) => {
     setName(e.target.value);
   };

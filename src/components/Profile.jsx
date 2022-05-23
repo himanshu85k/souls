@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { searchUser, web3 } from "../App.js";
+import { account, searchUser, web3 } from "../App.js";
 
 function Profile() {
   const [username, setUsername] = useState("");
   const [user, setUser] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
-
   const [bio, setBio] = useState("");
+  const [socialMediaPlatform, setSocialMediaPlatform] = useState("");
+  const [socialMediaProfileLink, setSocialMediaProfileLink] = useState("");
+  const [links, setLinks] = useState([]);
   const params = useParams();
 
   useEffect(() => {
@@ -15,28 +17,27 @@ function Profile() {
       if (username) {
         const userFound = await searchUser(username);
         console.log("User found", userFound);
-        /**
-         * bool isActive;
-        bytes32 name;
-        address owner;
-        string bio;
-        string avatar; // link to public profile image
-        bytes32[][] links;
-         */
         const userModified = {
           ...userFound,
           name: web3.utils.hexToAscii(userFound.name),
-          links: (userFound.links || []).map((item) => [
-            web3.utils.hexToAscii(item[0]),
-            web3.utils.hexToAscii(item[1]),
-          ]),
         };
         setUsername(username);
         console.log("User Modified", userModified);
         setUser(userModified);
+        if (account === userModified.owner) {
+          setIsOwner(true);
+        }
       }
     })(params.username);
   }, []);
+
+  const handleAddLinkClick = (e) => {
+    // TODO append the new link to existing links array
+  };
+
+  const handleSaveClick = (e) => {
+    // TODO 5 save the links to blockchain
+  };
 
   const handleBioChange = (e) => {
     setBio(e.target.value);
@@ -84,7 +85,7 @@ function Profile() {
                   ></i>
                   {
                     isOwner && <i className="bi bi-x"></i>
-                    // TODO 4: implement delete handlerd
+                    // TODO 4: implement delete handler
                   }
                   <br />
                 </>
@@ -92,12 +93,19 @@ function Profile() {
             })}
           <br />
           {isOwner && (
-            <button>
+            <>
+            <input type="text" id="socialMediaPlatform" value={socialMediaPlatform} onChange={(e) => setSocialMediaPlatform(e.target.value)}/>
+            <input type="text" id="socialMediaProfileLink" value={socialMediaProfileLink} onChange={(e) => setSocialMediaProfileLink(e.target.value)}/>
+            <button onClick={handleAddLinkClick}>
               Add Link
               <i class="bi bi-plus"></i>
             </button>
-            // TODO 5: provide input fields to enter new social media name and link
+            </>
           )}
+          {
+            isOwner &&
+            <button onClick={handleSaveClick}>Save</button>
+          }
         </>
       )}
     </div>
